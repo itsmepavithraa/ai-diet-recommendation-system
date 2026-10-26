@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Report — {{ patient.patient_id }}</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<div class="topbar">
+    <div class="brand">
+        <span class="mark">R</span>
+        AI Based Diet Recommendation System
+    </div>
+    <nav><a href="/">Patient Lookup</a></nav>
+</div>
+
+<div class="shell">
+
+    <a href="/" class="back-link">← Back to search</a>
+
+    <div class="report-header">
+        <div>
+            <p class="eyebrow">Personalized Health Report</p>
+            <h1 class="patient-name">{{ patient.full_name }}</h1>
+            <span class="patient-id-tag">Patient ID: {{ patient.patient_id }}</span>
+        </div>
+        <div class="action-row">
+            <a href="/report/{{ patient.patient_id }}/download" class="btn">⬇ Save PDF to saved_reports/</a>
+            <button onclick="window.print()" class="btn secondary">🖨 Print</button>
+        </div>
+    </div>
+
+    <div class="report-grid">
+
+        <!-- Retina image + DR stage -->
+        <div class="card retina-card">
+            <h3>Retina Image &amp; Diabetic Retinopathy Stage</h3>
+            <div class="retina-frame">
+                <img src="{{ url_for('static', filename='retina_images/' + patient.retina_image) }}"
+                     alt="Retina image for {{ patient.full_name }}">
+                <span class="confidence-pill">Model confidence {{ patient.confidence }}%</span>
+            </div>
+            <div class="dr-stage-block" style="margin-top:16px;">
+                <span class="risk-badge {{ severity_class }}">{{ patient.dr_severity }}</span>
+                <div class="stage-name">{{ patient.dr_stage }}</div>
+            </div>
+            <p style="font-size:12px; color:#6b756f; margin-top:10px;">
+                Severity predicted by the trained CNN model (diabetes_model.h5) directly from this retina image.
+            </p>
+        </div>
+
+        <!-- Patient details -->
+        <div class="card">
+            <h3>Patient Details</h3>
+            <ul class="detail-list">
+                <li><span class="dlabel">Age</span><span class="dvalue">{{ patient.age }}</span></li>
+                <li><span class="dlabel">Gender</span><span class="dvalue">{{ patient.gender }}</span></li>
+                <li><span class="dlabel">Height</span><span class="dvalue">{{ patient.height_cm }} cm</span></li>
+                <li><span class="dlabel">Weight</span><span class="dvalue">{{ patient.weight_kg }} kg</span></li>
+                <li><span class="dlabel">BMI</span><span class="dvalue">{{ patient.bmi }}</span></li>
+                <li><span class="dlabel">Activity Level</span><span class="dvalue">{{ patient.activity_level }}</span></li>
+                <li><span class="dlabel">Blood Pressure</span><span class="dvalue">{{ patient.blood_pressure }} mmHg</span></li>
+                <li><span class="dlabel">Glucose</span><span class="dvalue">{{ patient.glucose_mg }} mg/dL</span></li>
+                <li><span class="dlabel">Insulin</span><span class="dvalue">{{ patient.insulin_mu }} mu/L</span></li>
+            </ul>
+        </div>
+
+        <!-- Nutrition targets -->
+        <div class="card">
+            <h3>Daily Nutrition Targets</h3>
+            <div class="nutrition-grid">
+                <div class="vital">
+                    <div class="vlabel">Calories</div>
+                    <div class="vvalue">{{ patient.calories_kcal }}<span style="font-size:12px; font-weight:400;"> kcal/day</span></div>
+                </div>
+                <div class="vital">
+                    <div class="vlabel">Protein</div>
+                    <div class="vvalue">{{ patient.protein_g }}<span style="font-size:12px; font-weight:400;"> g</span></div>
+                </div>
+                <div class="vital">
+                    <div class="vlabel">Carbohydrates</div>
+                    <div class="vvalue">{{ patient.carbs_g }}<span style="font-size:12px; font-weight:400;"> g</span></div>
+                </div>
+                <div class="vital">
+                    <div class="vlabel">Fat</div>
+                    <div class="vvalue">{{ patient.fat_g }}<span style="font-size:12px; font-weight:400;"> g</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sample diet plan -->
+        <div class="card">
+            <h3>Personalized Indian Diet Plan</h3>
+            <div class="diet-pills">
+                {% for item in patient.diet_plan.split(';') %}
+                <div class="diet-pill">{{ item.strip() }}</div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Today's meal plan (live from food_items table) -->
+        <div class="card">
+            <h3>Today's Suggested Meal Plan</h3>
+            {% for meal_name, food in meal_plan.items() %}
+            <div class="meal-row">
+                <div class="meal-type">{{ meal_name }}</div>
+                <div style="flex:1;">
+                    {% if food %}
+                    <div class="meal-name">{{ food.food_name }}</div>
+                    <div class="meal-macros">
+                        {{ food.calories }} kcal &nbsp;·&nbsp; C:{{ food.carbs_g }}g &nbsp;P:{{ food.protein_g }}g &nbsp;F:{{ food.fat_g }}g
+                        {% if food.cuisine %} &nbsp;·&nbsp; {{ food.cuisine }}{% endif %}
+                    </div>
+                    {% else %}
+                    <span style="color:#999;">No item available</span>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Final recommendation -->
+        <div class="card recommendation-card">
+            <h3>Final Recommendation &amp; Control Guidance</h3>
+            <div class="final-line">{{ patient.recommendation }}</div>
+            <div class="detail-line">{{ patient.detailed_guidance }}</div>
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

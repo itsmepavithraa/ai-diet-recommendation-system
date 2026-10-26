@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Based Diet Recommendation System</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<div class="topbar">
+    <div class="brand">
+        <span class="mark">R</span>
+        AI Based Diet Recommendation System
+    </div>
+    <nav>
+        <a href="/">Patient Lookup</a>
+    </nav>
+</div>
+
+<div class="shell">
+    <div class="hero-grid">
+
+        <div class="hero-card">
+            <p class="eyebrow">Patient ID Healthcare Report</p>
+            <h1 class="hero-title">Enter a Patient ID,<br>get the full picture.</h1>
+            <p class="hero-sub">
+                Diabetic retinopathy stage, vitals, daily nutrition targets, and a
+                personalized Indian diet plan — assembled from one pre-loaded record.
+                Nothing to upload, nothing to fill in.
+            </p>
+
+            <form action="/" method="POST">
+                <div class="id-search-box">
+                    <label for="patient_id">Patient ID</label>
+                    <div class="id-search-row">
+                        <input type="text" id="patient_id" name="patient_id"
+                               placeholder="e.g. P001" autocomplete="off" required>
+                        <button type="submit" class="btn">Generate Report</button>
+                    </div>
+                </div>
+            </form>
+
+            {% if stats.sample_ids %}
+            <div class="try-row">
+                Try:
+                {% for sid in stats.sample_ids %}
+                <a class="try-chip" href="/report/{{ sid }}">{{ sid }}</a>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="stat-stack">
+            <div class="stat-card">
+                <div class="num">{{ stats.patients }}</div>
+                <div class="label">Patient records on file</div>
+            </div>
+            <div class="stat-card">
+                <div class="num">{{ stats.high_risk }}</div>
+                <div class="label">High / very high risk cases</div>
+            </div>
+            <div class="stat-card">
+                <div class="num">{{ stats.avg_calories }}</div>
+                <div class="label">Average kcal / day target</div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+</body>
+</html>
